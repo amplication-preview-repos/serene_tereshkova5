@@ -1,0 +1,62 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model TaskList {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  name       String?
+  user       User?     @relation(fields: [userId], references: [id])
+  userId     String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+  tasks      Task[]
+}
+
+model Task {
+  id          String            @id @default(cuid())
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  title       String?
+  description String?
+  dueDate     DateTime?
+  priority    EnumTaskPriority?
+  status      EnumTaskStatus?
+  taskList    TaskList?         @relation(fields: [taskListId], references: [id])
+  taskListId  String?
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  name      String?
+  taskLists TaskList[]
+}
+
+model User {
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  firstName String?
+  lastName  String?
+  username  String     @unique
+  email     String?    @unique
+  password  String
+  roles     Json
+  taskLists TaskList[]
+}
+
+enum EnumTaskPriority {
+  Option1
+}
+
+enum EnumTaskStatus {
+  Option1
+}
